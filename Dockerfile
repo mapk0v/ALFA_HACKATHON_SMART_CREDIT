@@ -1,8 +1,13 @@
-# Фронтенд — статика, собирать нечего: отдаём файлы nginx'ом.
-FROM nginx:1.27-alpine
+FROM python:3.14-slim
 
-COPY index.html styles.css api.js app.js /usr/share/nginx/html/
-COPY assets/ /usr/share/nginx/html/assets/
+WORKDIR /app
 
-EXPOSE 80
-HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://localhost/ >/dev/null || exit 1
+# Копируем зависимости и устанавливаем их
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копируем исходный код
+COPY . .
+
+# Запускаем приложение
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

@@ -1,13 +1,28 @@
+#version: '3.8'
 services:
-  frontend:
-    build: .
-    image: alfa-credit-frontend:local
-    container_name: alfa-credit-frontend
+  ollama:
+    image: ollama/ollama:latest
     ports:
-      - "8080:80"
-    restart: unless-stopped
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
 
-# Запуск: docker compose up --build  →  http://localhost:8080
-#
-# Когда появится бэкенд, он добавляется сюда же отдельным сервисом,
-# а в api.js меняется API_BASE_URL (например, http://backend:8000/api).
+  # Автоматическая загрузка модели при старте
+  ollama-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - ollama
+    entrypoint: >
+      /bin/sh -c "sleep 10 && curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"qwen3:1.7b\"}'"
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama
+    volumes:
+      - ./backend:/app # Для hot-reload при разработке
+
+volumes:
+  ollama_data:
