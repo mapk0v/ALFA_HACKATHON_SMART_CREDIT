@@ -1,0 +1,28 @@
+#version: '3.8'
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  # Автоматическая загрузка модели при старте
+  ollama-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - ollama
+    entrypoint: >
+      /bin/sh -c "sleep 10 && curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"qwen3:1.7b\"}'"
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama
+    volumes:
+      - ./backend:/app # Для hot-reload при разработке
+
+volumes:
+  ollama_data:
