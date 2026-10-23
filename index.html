@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Умный кредитный кабинет предпринимателя</title>
+  <meta name="description" content="Цифровой кредитный конвейер для малого и микробизнеса: подбор продукта, заявка, скоринг и решение банка в одном окне." />
+  <link rel="icon" href="assets/favicon.png" />
+  <meta name="color-scheme" content="light dark" />
+
+  <!-- Тема ставится до отрисовки, чтобы не было вспышки светлого фона -->
+  <script>
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('akk-theme');
+        theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      } catch (e) { /* приватный режим браузера */ }
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+
+  <!-- Шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Дизайн-система проекта. Полностью автономна: интерфейс корректно отрисуется,
+       даже если Tailwind не загрузится (например, нет интернета на демо-стенде). -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Tailwind CDN: утилитарные классы для быстрых правок поверх styles.css -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        corePlugins: { preflight: false },
+        theme: {
+          extend: {
+            colors: {
+              primary: '#EF3123',
+              'primary-dark': '#C8241A',
+              'primary-light': '#FFE9E7',
+              bg: '#F5F5F7',
+              ink: '#1F1F1F',
+              muted: '#6B6B6B'
+            },
+            fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+            borderRadius: { xl: '12px', '2xl': '16px' },
+            boxShadow: { sm: '0 1px 2px rgba(31,31,31,.04), 0 8px 24px rgba(31,31,31,.05)' }
+          }
+        }
+      };
+    }
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <noscript>
+    <div class="boot-note">Для работы прототипа включите JavaScript.</div>
+  </noscript>
+
+  <!-- Показывается, если React/Babel не загрузились или файл открыт по file:// -->
+  <div id="boot-note" class="boot-note" hidden>
+    <h2>Прототип не запустился</h2>
+    <p>
+      JSX компилируется в браузере через Babel, поэтому файлы нужно отдавать по HTTP,
+      а не открывать как <code>file://</code>.
+    </p>
+    <p>Запустите локальный сервер в папке проекта:</p>
+    <pre>python -m http.server 5500</pre>
+    <p>и откройте <code>http://localhost:5500</code>. В VS Code подойдёт расширение Live Server.</p>
+    <p class="boot-note__muted">Вторая возможная причина — нет доступа к CDN (React, Babel, Tailwind).</p>
+  </div>
+
+  <!-- ===== Библиотеки (CDN, без сборщиков) ===== -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.52.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.4/babel.min.js"></script>
+
+  <!-- ===== Код приложения ===== -->
+  <script src="api.js"></script>
+  <script type="text/babel" data-presets="react" src="app.js"></script>
+
+  <script>
+    // Если через 4 секунды приложение не смонтировалось — показываем инструкцию по запуску.
+    setTimeout(function () {
+      var root = document.getElementById('root');
+      if (!root || root.childElementCount === 0) {
+        document.getElementById('boot-note').hidden = false;
+      }
+    }, 4000);
+  </script>
+</body>
+</html>

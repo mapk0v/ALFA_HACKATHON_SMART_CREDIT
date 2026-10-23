@@ -1,0 +1,13 @@
+services:
+  frontend:
+    build: .
+    image: alfa-credit-frontend:local
+    container_name: alfa-credit-frontend
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+# Запуск: docker compose up --build  →  http://localhost:8080
+#
+# Когда появится бэкенд, он добавляется сюда же отдельным сервисом,
+# а в api.js меняется API_BASE_URL (например, http://backend:8000/api).
