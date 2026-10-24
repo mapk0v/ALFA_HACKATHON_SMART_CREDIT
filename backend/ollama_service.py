@@ -4,7 +4,7 @@ import re
 import json
 
 logger = logging.getLogger(__name__)
-OLLAMA_URL = "http://ollama:11434/api/generate"
+OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL = "qwen3:1.7b"#"qwen2.5:3b" # Легкая модель, работает даже на CPU
 
 class OllamaService:
@@ -36,19 +36,71 @@ class OllamaService:
             {"title": "Гранты для предпринимателей", "summary": "Обзор федеральных программ поддержки.", "relevance": "Дополнительные источники финансирования"}
         ]
 
+#     async def extract_entities(self, text: str) -> dict:
+#         """Использует LLM только для NLU (извлечение суммы и срока из текста)."""
+#         prompt = f"""Извлеки сумму кредита (в рублях, числом) и срок (в месяцах, числом) из текста.
+# Если не указано, верни null. Верни СТРОГО JSON: {{"amount": number|null, "term": number|null}}
+# Текст: "{text}" """
+#         try:
+#             resp = await self.client.post(OLLAMA_URL, json={
+#                 "model": MODEL, "prompt": prompt, "stream": False, "options": {"temperature": 0.1, "num_predict": 100}
+#             })
+#             text_resp = resp.json().get("response", "{}")
+#             match = re.search(r'\{.*\}', text_resp, re.DOTALL)
+#             return json.loads(match.group(0)) if match else {}
+#         except Exception:
+#             return {}
     async def extract_entities(self, text: str) -> dict:
         """Использует LLM только для NLU (извлечение суммы и срока из текста)."""
         prompt = f"""Извлеки сумму кредита (в рублях, числом) и срок (в месяцах, числом) из текста.
-Если не указано, верни null. Верни СТРОГО JSON: {{"amount": number|null, "term": number|null}}
-Текст: "{text}" """
+    Если не указано, верни null. Верни СТРОГО JSON без markdown:
+    {{"amount": number|null, "term": number|null}}
+
+    Примеры:
+    - "Хочу купить оборудование за 6 млн" → {{"amount": 6000000, "term": null}}
+    - "Нужно 500 тысяч на 12 месяцев" → {{"amount": 500000, "term": 12}}
+    - "Кредит на 24 месяца" → {{"amount": null, "term": 24}}
+
+    Текст: "{text}"
+
+    Ответ:"""
+    
         try:
-            resp = await self.client.post(OLLAMA_URL, json={
-                "model": MODEL, "prompt": prompt, "stream": False, "options": {"temperature": 0.1, "num_predict": 100}
-            })
+            resp = await self.client.post(
+                OLLAMA_URL,
+                json={
+                    "model": MODEL,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {"temperature": 0.1, "num_predict": 100},
+                },
+            )
             text_resp = resp.json().get("response", "{}")
-            match = re.search(r'\{.*\}', text_resp, re.DOTALL)
-            return json.loads(match.group(0)) if match else {}
-        except Exception:
+
+            # Ищем JSON в ответе (может быть обёрнут в markdown)
+            match = re.search(r'\{[^{}]*"amount"[^{}]*\}', text_resp, re.DOTALL)
+            if match:
+                return json.loads(match.group(0))
+
+            # Fallback: пробуем извлечь числа регулярками
+            amount_match = re.search(r'(\d+)\s*(млн|million)', text.lower())
+            if amount_match:
+                amount = int(amount_match.group(1)) * 1_000_000
+            else:
+                amount_match = re.search(r'(\d+)\s*(тыс|thousand)', text.lower())
+                if amount_match:
+                    amount = int(amount_match.group(1)) * 1_000
+                else:
+                    amount_match = re.search(r'(\d{5,9})', text.replace(' ', ''))
+                    amount = int(amount_match.group(1)) if amount_match else None
+
+            term_match = re.search(r'(\d{1,2})\s*(мес|month)', text.lower())
+            term = int(term_match.group(1)) if term_match else None
+
+            return {"amount": amount, "term": term}
+
+        except Exception as e:
+            logger.error(f"Ollama extract_entities error: {e}")
             return {}
 
 ollama_service = OllamaService()
