@@ -4,8 +4,8 @@ import re
 import json
 
 logger = logging.getLogger(__name__)
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "qwen3:1.7b"#"qwen2.5:3b" # Легкая модель, работает даже на CPU
+OLLAMA_URL = "http://localhost:11434/api/generate" # при запуске через Docker поменять localhost на ollama
+MODEL = "qwen3:1.7b"#"qwen2.5:3b" # Легкая модель, работает даже на CPU подмена модели здесь
 
 class OllamaService:
     def __init__(self):
