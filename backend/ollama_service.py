@@ -36,20 +36,6 @@ class OllamaService:
             {"title": "Гранты для предпринимателей", "summary": "Обзор федеральных программ поддержки.", "relevance": "Дополнительные источники финансирования"}
         ]
 
-#     async def extract_entities(self, text: str) -> dict:
-#         """Использует LLM только для NLU (извлечение суммы и срока из текста)."""
-#         prompt = f"""Извлеки сумму кредита (в рублях, числом) и срок (в месяцах, числом) из текста.
-# Если не указано, верни null. Верни СТРОГО JSON: {{"amount": number|null, "term": number|null}}
-# Текст: "{text}" """
-#         try:
-#             resp = await self.client.post(OLLAMA_URL, json={
-#                 "model": MODEL, "prompt": prompt, "stream": False, "options": {"temperature": 0.1, "num_predict": 100}
-#             })
-#             text_resp = resp.json().get("response", "{}")
-#             match = re.search(r'\{.*\}', text_resp, re.DOTALL)
-#             return json.loads(match.group(0)) if match else {}
-#         except Exception:
-#             return {}
     async def extract_entities(self, text: str) -> dict:
         """Использует LLM только для NLU (извлечение суммы и срока из текста)."""
         prompt = f"""Извлеки сумму кредита (в рублях, числом) и срок (в месяцах, числом) из текста.
