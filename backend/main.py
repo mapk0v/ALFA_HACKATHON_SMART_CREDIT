@@ -37,7 +37,7 @@ async def health():
 async def health_ollama():
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
-            resp = await client.get("http://localhost:11434")
+            resp = await client.get("http://localhost:11434") #При запуске через Docker поменять localhost на ollama 
             if resp.status_code == 200:
                 return {"status": "healthy", "service": "ollama"}
             return {"status": "unhealthy", "service": "ollama"}
