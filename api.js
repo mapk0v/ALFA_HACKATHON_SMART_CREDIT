@@ -93,18 +93,17 @@ async function apiSendChatMessage(text, history, context = {}) {
     });
 }
 
-// POST /api/applications
+// POST /api/applications — новая заявка всегда создаётся в статусе scoring.
 async function apiCreateApplication(data) {
     return apiRequest('/applications', {
         method: 'POST',
-        query: {
-            amount: data.amount,
-            term: data.term,
-            client_id: CURRENT_CLIENT,
-            product_id: data.productId,
-            product_name: data.productName,
-            purpose: data.purpose || '',
-        },
+        body: {
+            amount: Number(data.amount),
+            term: Number(data.term),
+            client_id: data.client_id || CURRENT_CLIENT,
+            product_id: data.productId || data.product_id || 'working',
+            purpose: data.purpose || 'Пополнение оборотных средств'
+        }
     });
 }
 

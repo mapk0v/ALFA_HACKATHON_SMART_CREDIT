@@ -42,6 +42,32 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+    # Мягкая миграция заявок, которые старая версия прототипа могла
+    # автоматически пометить одобренными сразу после скоринга.
+    async with AsyncSessionLocal() as session:
+        from sqlalchemy import select
+        result = await session.execute(
+            select(Application).where(Application.status.in_(["approved", "counter_offer", "declined"]))
+        )
+        changed = False
+        for item in result.scalars().all():
+            history = item.history or []
+            has_human_decision = bool(item.decision_comment) or any(
+                event.get("title") == "Решение принято" for event in history if isinstance(event, dict)
+            )
+            if not has_human_decision:
+                item.status = "scoring"
+                item.decision_comment = None
+                item.counter_offer = None
+                item.history = history + [{
+                    "at": datetime.utcnow().isoformat(),
+                    "title": "Возвращена на рассмотрение",
+                    "text": "Старая версия прототипа выставила статус автоматически. Заявка возвращена в очередь специалиста.",
+                }]
+                changed = True
+        if changed:
+            await session.commit()
+
 
 async def get_db():
     async with AsyncSessionLocal() as session:

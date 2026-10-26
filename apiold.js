@@ -10,7 +10,7 @@
 
 /* Базовый адрес бэкенда. Для локальной разработки — FastAPI на 8000 порту. */
 const API_BASE_URL = 'http://localhost:8000/api';
-
+const CURRENT_CLIENT = "client_001";
 /*
   Конфигурация ИИ-ассистента. Запросы идёт через бэкенд, фронтенд знает только
   адрес своего API. На стороне сервера используется модель с открытыми весами и
@@ -220,7 +220,7 @@ async function apiLogin(phone, name, company) {
 }
 
 // TODO: ИНТЕГРАЦИЯ. Замени этот мок на fetch к FastAPI: POST /api/chat
-async function apiSendChatMessage(text, history) {
+/*async function apiSendChatMessage(text, history) {
   await delay(900);
 
   const botTurns = (history || []).filter((m) => m.role === 'bot').length;
@@ -228,7 +228,7 @@ async function apiSendChatMessage(text, history) {
   const term = parseTerm(text);
 
   /* Шаг 1: клиент описал потребность — уточняем срок */
-  if (botTurns <= 1) {
+  /*if (botTurns <= 1) {
     return {
       reply:
         `Принято: ${amount ? formatMoney(amount) : 'сумму'} на пополнение оборотных средств. ` +
@@ -239,7 +239,7 @@ async function apiSendChatMessage(text, history) {
   }
 
   /* Шаг 2: клиент назвал срок — отдаём рекомендацию продукта */
-  const chosenTerm = term || 12;
+  /*const chosenTerm = term || 12;
   const chosenAmount = amount || lastAmount(history) || 2_000_000;
   const product = pickProduct(chosenAmount, chosenTerm);
   const payment = calcPayment(chosenAmount, chosenTerm, product.rate);
@@ -260,7 +260,81 @@ async function apiSendChatMessage(text, history) {
       why: `Сумма ${formatMoney(chosenAmount)} и срок ${chosenTerm} мес. попадают в условия продукта, залог не требуется.`
     }
   };
-}
+}  */
+  
+/*async function apiSendChatMessage(text, currentContext = {}) {
+  try {;
+    const response = await fetch("http://localhost:8000/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+
+        text: text,
+        context: currentContext // Передаем то, что уже знаем о клиенте
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Бэкенд вернет ровно ту структуру, которую ты ожидал от мока!
+    const data = await response.json();
+    return data; 
+    
+  } catch (error) {
+    console.error("Chat API error:", error);
+    // Graceful fallback, если бэкенд упал
+    return {
+      reply: "Извините, сейчас я не могу обработать запрос. Попробуйте позже или обратитесь к менеджеру.",
+      context: currentContext,
+      offer: null
+    };
+  }
+}  */
+
+/* async function apiSendChatMessage(text, history, clientId = 'client_001') {
+  // Извлекаем контекст из истории (последний сохраненный context от бота)
+  const lastContext = [...(history || [])].reverse().find(m => m.context)?.context || {};
+
+  // Настраиваем таймаут для избежания зависания
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 секунд
+
+  try {
+    const response = await fetch('/api/chat', { // Замените на реальный URL вашего API
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        clientId: clientId // Передаем ID клиента в заголовке
+      },
+      body: JSON.stringify({
+        text,
+        context: lastContext // Передаем контекст из предыдущих сообщений
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Ошибка сервера: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Бэкенд возвращает структуру {reply, context, offer}, 
+    // которая полностью совместима с тем, что ожидает фронтенд
+    return data;
+    
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Превышено время ожидания ответа от сервера');
+    }
+    throw error;
+  }
+} */
 
 // TODO: ИНТЕГРАЦИЯ. Замени этот мок на fetch к FastAPI: POST /api/applications
 async function apiCreateApplication(data) {

@@ -7,6 +7,42 @@
 
 const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
+function calcPayment(amount, term, rate) {
+  if (!amount || !term || !rate) return 0;
+  const monthlyRate = rate / 100 / 12;
+  return amount * (monthlyRate * Math.pow(1 + monthlyRate, term)) / 
+         (Math.pow(1 + monthlyRate, term) - 1);
+}
+
+function formatMoney(amount) {
+  if (!amount) return "0 ₽";
+  return Math.round(amount).toLocaleString("ru-RU") + " ₽";
+}
+
+function parseAmount(text) {
+  const match = String(text).match(/(\d[\d\s]*)\s*(?:млн|тыс|руб|₽|rur)?/i);
+  if (!match) return null;
+  let num = match[1].replace(/\s/g, "");
+  if (String(text).toLowerCase().includes("млн")) num *= 1_000_000;
+  if (String(text).toLowerCase().includes("тыс")) num *= 1_000;
+  return Number(num);
+}
+
+function parseTerm(text) {
+  const match = String(text).match(/(\d+)\s*(?:мес|месяц|год)/i);
+  return match ? Number(match[1]) : null;
+}
+
+function pickProduct(amount, term) {
+  if (amount <= 3_000_000 && term <= 24) {
+    return { id: "prod_1", name: "Экспресс-оборот", rate: 18.5, pledge: "без залога" };
+  }
+  if (amount <= 10_000_000) {
+    return { id: "prod_2", name: "Бизнес-Инвестиция", rate: 16.0, pledge: "под залог оборудования" };
+  }
+  return { id: "prod_3", name: "Кредитная линия", rate: 19.0, pledge: "под поручительство" };
+}
+
 /* ============================================================
    Мелкие утилиты интерфейса
    ============================================================ */
@@ -1401,7 +1437,7 @@ function App() {
   }
 
   const { user, company } = session;
-  const myApplications = applications.filter((a) => a.companyName === company.name);
+  const myApplications = applications.filter((a) => a.client_id === (user.client_id || 'client_001'));
   const current = applications.find((a) => a.id === currentId) || myApplications[0] || null;
   const pendingCount = applications.filter((a) => a.status === APP_STATUS.SCORING).length;
 
@@ -1427,13 +1463,14 @@ function App() {
   }
 
   async function acceptCounter(application) {
-    await apiBankDecision(
-      application.id,
-      APP_STATUS.APPROVED,
-      'Клиент принял изменённые условия. Кредит одобрен, документы готовятся к подписанию.'
-    );
-    await refresh();
-    notify('Условия приняты. Заявка переведена в статус «Одобрено».');
+    setBusy(true);
+    try {
+      await apiAcceptOffer(application.id);
+      await refresh();
+      notify('Альтернативные условия приняты. Проверьте договор и подтвердите подписание.');
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function acceptOffer(application) {

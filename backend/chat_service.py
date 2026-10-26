@@ -54,8 +54,9 @@ async def process_chat_message(req: ChatRequest, client_id: str) -> ChatResponse
     if decision["decision"] == "declined":
         return ChatResponse(
             reply=(
-                f"К сожалению, по запросу на {int(amount):,} ₽ принято отрицательное решение. "
-                f"Причина: {decision['reason']}"
+                f"Предварительная оценка выявила повышенный риск по запросу на {int(amount):,} ₽. "
+                f"Это не является официальным отказом: окончательное решение возможно только после подачи заявки "
+                f"и проверки кредитным специалистом. Причина предварительного сигнала: {decision['reason']}"
             ),
             context={"amount": amount, "term": term},
             offer=None
