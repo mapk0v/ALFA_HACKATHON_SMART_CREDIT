@@ -42,8 +42,8 @@ async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    # Мягкая миграция заявок, которые старая версия прототипа могла
-    # автоматически пометить одобренными сразу после скоринга.
+
+
     async with AsyncSessionLocal() as session:
         from sqlalchemy import select
         result = await session.execute(

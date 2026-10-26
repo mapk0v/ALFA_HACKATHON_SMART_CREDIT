@@ -31,7 +31,7 @@ class ApplicationCreateRequest(BaseModel):
 app = FastAPI(title="Smart Credit Cabinet API", version="1.1.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Для локального демонстрационного прототипа.
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -153,7 +153,7 @@ async def create_application(req: ApplicationCreateRequest, db: AsyncSession = D
     if req.product_id not in PRODUCTS:
         raise HTTPException(status_code=422, detail="Unknown product_id")
 
-    # Скоринг — только рекомендация. Он НЕ принимает финальное решение по заявке.
+
     score_result = evaluate_credit(req.amount, req.term, req.client_id)
     product = PRODUCTS[req.product_id]
     monthly_rate = product["rate"] / 100 / 12

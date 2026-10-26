@@ -1,16 +1,16 @@
-/* ============================================================
-   app.js — React-компоненты и логика прототипа.
-   JSX компилируется в браузере (Babel Standalone), сборщик не нужен.
-   Состояние поднято в корневой компонент App, роли «Клиент» и «Банк»
-   работают с одним и тем же набором заявок.
-   ============================================================ */
+
+
+
+
+
+
 
 const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
 function calcPayment(amount, term, rate) {
   if (!amount || !term || !rate) return 0;
   const monthlyRate = rate / 100 / 12;
-  return amount * (monthlyRate * Math.pow(1 + monthlyRate, term)) / 
+  return amount * (monthlyRate * Math.pow(1 + monthlyRate, term)) /
          (Math.pow(1 + monthlyRate, term) - 1);
 }
 
@@ -43,11 +43,11 @@ function pickProduct(amount, term) {
   return { id: "prod_3", name: "Кредитная линия", rate: 19.0, pledge: "под поручительство" };
 }
 
-/* ============================================================
-   Мелкие утилиты интерфейса
-   ============================================================ */
 
-/* Иконка Lucide. Если библиотека не загрузилась — просто ничего не рисуем. */
+
+
+
+
 function LIcon({ name, size = 18, className = '' }) {
   const host = useRef(null);
 
@@ -71,7 +71,7 @@ function LIcon({ name, size = 18, className = '' }) {
   return <span className={'licon ' + className} ref={host} aria-hidden="true" />;
 }
 
-/* Переключатель темы. Выбор запоминается, начальная тема ставится в index.html до отрисовки. */
+
 function ThemeToggle({ theme, onToggle, compact }) {
   const dark = theme === 'dark';
   const label = dark ? 'Светлая тема' : 'Тёмная тема';
@@ -109,10 +109,10 @@ function StatusBadge({ status }) {
   );
 }
 
-/* Иллюстрация пустого состояния.
-   Раньше это были PNG со сплошной белой заливкой — на тёмной теме корпус
-   сливался с фоном. Векторная версия построена на токенах темы, поэтому
-   одинаково читается и в светлой, и в тёмной. */
+
+
+
+
 const SPARK_PATH =
   'M12 0c0 6.63 5.37 12 12 12-6.63 0-12 5.37-12 12 0-6.63-5.37-12-12-12 6.63 0 12-5.37 12-12z';
 
@@ -121,19 +121,19 @@ function EmptyArt({ variant = 'client' }) {
     <svg className="empty__art" viewBox="0 0 128 104" role="img" aria-hidden="true" focusable="false">
       {variant === 'bank' ? (
         <g>
-          {/* задняя стенка лотка */}
+          {}
           <path
             d="M14 40a8 8 0 0 1 8-8h84a8 8 0 0 1 8 8v44a8 8 0 0 1-8 8H22a8 8 0 0 1-8-8z"
             fill="var(--surface-2)"
             stroke="var(--line)"
             strokeWidth="2"
           />
-          {/* документ */}
+          {}
           <rect x="34" y="20" width="60" height="46" rx="8" fill="var(--red)" />
           <g stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity=".85">
             <path d="M46 34h36M46 43h36M46 52h22" />
           </g>
-          {/* передняя стенка лотка */}
+          {}
           <path
             d="M10 58h108a5 5 0 0 1 4.9 6l-4.3 23a9 9 0 0 1-8.9 7.4H18.3a9 9 0 0 1-8.9-7.4l-4.3-23A5 5 0 0 1 10 58z"
             fill="var(--red-light)"
@@ -143,14 +143,14 @@ function EmptyArt({ variant = 'client' }) {
         </g>
       ) : (
         <g>
-          {/* корпус папки */}
+          {}
           <path
             d="M6 28a8 8 0 0 1 8-8h30.8a8 8 0 0 1 6.2 3l6 7.3a4 4 0 0 0 3.1 1.5H114a8 8 0 0 1 8 8v44a8 8 0 0 1-8 8H14a8 8 0 0 1-8-8z"
             fill="var(--surface-2)"
             stroke="var(--line)"
             strokeWidth="2"
           />
-          {/* передняя створка */}
+          {}
           <path
             d="M12 50h104a5 5 0 0 1 4.9 6l-4.6 25a9 9 0 0 1-8.9 7.4H20.6a9 9 0 0 1-8.9-7.4l-4.6-25A5 5 0 0 1 12 50z"
             fill="var(--red-light)"
@@ -159,7 +159,7 @@ function EmptyArt({ variant = 'client' }) {
           />
         </g>
       )}
-      {/* искры */}
+      {}
       <g fill="var(--red)">
         <path d={SPARK_PATH} transform="translate(96 2) scale(.72)" />
         <path d={SPARK_PATH} transform="translate(116 22) scale(.4)" />
@@ -180,9 +180,9 @@ function initials(name) {
     .join('');
 }
 
-/* ============================================================
-   Экран 1. Вход и регистрация
-   ============================================================ */
+
+
+
 
 function LoginScreen({ onLogin, theme, onToggleTheme }) {
   const [form, setForm] = useState({
@@ -283,9 +283,9 @@ function LoginScreen({ onLogin, theme, onToggleTheme }) {
   );
 }
 
-/* ============================================================
-   Каркас: сайдбар и верхняя панель
-   ============================================================ */
+
+
+
 
 const CLIENT_NAV = [
   { key: 'dashboard', label: 'Обзор', icon: 'assets/icon-home.png' },
@@ -370,9 +370,9 @@ function Topbar({ role, onRoleChange, user, company, crumbs, theme, onToggleThem
   );
 }
 
-/* ============================================================
-   Экран 2. Обзор (дашборд клиента)
-   ============================================================ */
+
+
+
 
 function DashboardScreen({ company, user, applications, onNavigate, onOpenApplication, onPickProduct }) {
   const active = applications.filter((a) => a.status === APP_STATUS.SCORING).length;
@@ -510,9 +510,9 @@ function DashboardScreen({ company, user, applications, onNavigate, onOpenApplic
   );
 }
 
-/* ============================================================
-   Экран 3. ИИ-ассистент
-   ============================================================ */
+
+
+
 
 const QUICK_PROMPTS = [
   'Нужен кредит 2 млн на закупку товара',
@@ -554,8 +554,6 @@ function ChatScreen({ onUseOffer }) {
       const response = await apiSendChatMessage(trimmed, history, context);
 
       setMessages((prev) => [...prev, { role: 'bot', text: response.reply, at: new Date().toISOString() }]);
-
-      // БЕЗОПАСНО: сохраняем контекст только если он есть и является объектом
       if (response && response.context && typeof response.context === 'object') {
         setContext(response.context);
       }
@@ -678,9 +676,9 @@ function ChatScreen({ onUseOffer }) {
   );
 }
 
-/* ============================================================
-   Экран 4. Заявка
-   ============================================================ */
+
+
+
 
 const DOCUMENTS = [
   { name: 'Выписка по расчётному счёту', source: 'получена из банка' },
@@ -885,9 +883,9 @@ function ApplicationScreen({ draft, company, onSubmitted, onNavigate }) {
   );
 }
 
-/* ============================================================
-   Экран 5. Статус заявки
-   ============================================================ */
+
+
+
 
 const STATUS_VIEW = {
   scoring: {
@@ -936,7 +934,7 @@ const STATUS_VIEW = {
 
 const TRACK_STEPS = ['Создана', 'Проверка данных', 'Скоринг', 'Решение', 'Подписание', 'Выдача'];
 
-/* Текущий этап конвейера по статусу заявки */
+
 function trackIndex(status) {
   switch (status) {
     case APP_STATUS.SCORING: return 2;
@@ -950,7 +948,7 @@ function trackIndex(status) {
   }
 }
 
-/* Подписание: документы, согласие и код подтверждения — всё внутри продукта */
+
 function SigningBlock({ application, onSign, busy }) {
   const [code, setCode] = useState('');
   const [agreed, setAgreed] = useState(false);
@@ -1225,9 +1223,9 @@ function StatusScreen({ application, onNavigate, onAcceptCounter, onAcceptOffer,
   );
 }
 
-/* ============================================================
-   Экран 6. CRM банка
-   ============================================================ */
+
+
+
 
 const CRM_FILTERS = [
   { key: 'all', label: 'Все заявки' },
@@ -1383,9 +1381,9 @@ function BankScreen({ applications, onDecision, busyId }) {
   );
 }
 
-/* ============================================================
-   Корневой компонент: состояние приложения и маршрутизация
-   ============================================================ */
+
+
+
 
 function App() {
   const [screen, setScreen] = useState('login');
@@ -1401,7 +1399,7 @@ function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    try { localStorage.setItem('akk-theme', theme); } catch (e) { /* приватный режим */ }
+    try { localStorage.setItem('akk-theme', theme); } catch (e) {  }
   }, [theme]);
 
   const toggleTheme = useCallback(() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark')), []);

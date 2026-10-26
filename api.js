@@ -1,8 +1,8 @@
-/* ============================================================
-   api.js — слой интеграции с бэкендом FastAPI.
-   Все функции делают реальные HTTP-запросы. Контракты
-   синхронизированы с main.py.
-============================================================ */
+
+
+
+
+
 const API_BASE_URL = 'http://localhost:8000/api';
 const CURRENT_CLIENT = 'client_001';
 
@@ -12,9 +12,9 @@ const LLM_PROFILE = {
     endpoint: API_BASE_URL + '/chat',
 };
 
-/* ============================================================
-   Справочники (локальные — идентичны витрине продуктов банка)
-============================================================ */
+
+
+
 const PRODUCTS = {
     working: {
         id: 'working', name: 'Оборотный кредит', rate: 18.5,
@@ -54,9 +54,9 @@ const STATUS_LABEL = {
 };
 const FINAL_STATUSES = [APP_STATUS.REJECTED, APP_STATUS.SIGNING, APP_STATUS.SIGNED, APP_STATUS.ISSUED];
 
-/* ============================================================
-   Универсальный fetch-обёртка
-============================================================ */
+
+
+
 async function apiRequest(path, { method = 'GET', body = null, query = {} } = {}) {
     const url = new URL(API_BASE_URL + path, window.location.origin);
     Object.entries(query).forEach(([k, v]) => {
@@ -72,11 +72,11 @@ async function apiRequest(path, { method = 'GET', body = null, query = {} } = {}
     return res.json();
 }
 
-/* ============================================================
-   API-методы
-============================================================ */
 
-// POST /api/auth/login
+
+
+
+
 async function apiLogin(phone, name, company) {
     return apiRequest('/auth/login', {
         method: 'POST',
@@ -84,16 +84,16 @@ async function apiLogin(phone, name, company) {
     });
 }
 
-// POST /api/chat
+
 async function apiSendChatMessage(text, history, context = {}) {
     return apiRequest('/chat', {
         method: 'POST',
         query: { client_id: CURRENT_CLIENT },
-        body: { text, context }, // ← ПЕРЕДАЁМ КОНТЕКСТ НА БЭКЕНД
+        body: { text, context },
     });
 }
 
-// POST /api/applications — новая заявка всегда создаётся в статусе scoring.
+
 async function apiCreateApplication(data) {
     return apiRequest('/applications', {
         method: 'POST',
@@ -107,7 +107,7 @@ async function apiCreateApplication(data) {
     });
 }
 
-// GET /api/applications
+
 async function apiGetApplications() {
     return apiRequest('/applications', {
         method: 'GET',
@@ -115,7 +115,7 @@ async function apiGetApplications() {
     });
 }
 
-// PATCH /api/applications/{id}/decision
+
 async function apiBankDecision(id, status, comment) {
     return apiRequest(`/applications/${id}/decision`, {
         method: 'PATCH',
@@ -123,12 +123,12 @@ async function apiBankDecision(id, status, comment) {
     });
 }
 
-// POST /api/applications/{id}/offer/accept
+
 async function apiAcceptOffer(id) {
     return apiRequest(`/applications/${id}/offer/accept`, { method: 'POST' });
 }
 
-// POST /api/applications/{id}/sign
+
 async function apiSignDocuments(id, code) {
     return apiRequest(`/applications/${id}/sign`, {
         method: 'POST',
@@ -136,19 +136,19 @@ async function apiSignDocuments(id, code) {
     });
 }
 
-// POST /api/applications/{id}/disburse
+
 async function apiDisburse(id) {
     return apiRequest(`/applications/${id}/disburse`, { method: 'POST' });
 }
 
-// POST /api/clients/{id}/news
+
 async function apiGetNews(clientId = CURRENT_CLIENT) {
     return apiRequest(`/clients/${clientId}/news`, { method: 'POST' });
 }
 
-/* ============================================================
-   Вспомогательные функции (остались без изменений)
-============================================================ */
+
+
+
 function formatMoney(value) {
     if (value === null || value === undefined || Number.isNaN(value)) return '—';
     return new Intl.NumberFormat('ru-RU').format(Math.round(value)) + ' ₽';

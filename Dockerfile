@@ -1,4 +1,3 @@
-# Фронтенд — статика, собирать нечего: отдаём файлы nginx'ом.
 FROM nginx:1.27-alpine
 
 COPY index.html styles.css api.js app.js /usr/share/nginx/html/

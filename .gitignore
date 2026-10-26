@@ -1,11 +1,24 @@
-# OS files
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local databases and generated data
+*.db
+*.sqlite
+*.sqlite3
+
+# JavaScript dependencies
+node_modules/
+
+# IDE and OS files
+.idea/
+.vscode/
 .DS_Store
 Thumbs.db
-
-# IDE / Editor
-.vscode/
-.idea/
-
-# Environment variables
-.env
-.env.local

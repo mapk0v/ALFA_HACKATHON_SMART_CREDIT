@@ -8,28 +8,28 @@
   <link rel="icon" href="assets/favicon.png" />
   <meta name="color-scheme" content="light dark" />
 
-  <!-- Тема ставится до отрисовки, чтобы не было вспышки светлого фона -->
+
   <script>
     (function () {
       var theme = 'light';
       try {
         var saved = localStorage.getItem('akk-theme');
         theme = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      } catch (e) { /* приватный режим браузера */ }
+      } catch (e) {  }
       document.documentElement.dataset.theme = theme;
     })();
   </script>
 
-  <!-- Шрифт -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Дизайн-система проекта. Полностью автономна: интерфейс корректно отрисуется,
-       даже если Tailwind не загрузится (например, нет интернета на демо-стенде). -->
+
+
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Tailwind CDN: утилитарные классы для быстрых правок поверх styles.css -->
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     if (window.tailwind) {
@@ -61,7 +61,7 @@
     <div class="boot-note">Для работы прототипа включите JavaScript.</div>
   </noscript>
 
-  <!-- Показывается, если React/Babel не загрузились или файл открыт по file:// -->
+
   <div id="boot-note" class="boot-note" hidden>
     <h2>Прототип не запустился</h2>
     <p>
@@ -74,18 +74,18 @@
     <p class="boot-note__muted">Вторая возможная причина — нет доступа к CDN (React, Babel, Tailwind).</p>
   </div>
 
-  <!-- ===== Библиотеки (CDN, без сборщиков) ===== -->
+
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@1.52.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.4/babel.min.js"></script>
 
-  <!-- ===== Код приложения ===== -->
+
   <script src="api.js"></script>
   <script type="text/babel" data-presets="react" src="app.js"></script>
 
   <script>
-    // Если через 4 секунды приложение не смонтировалось — показываем инструкцию по запуску.
+
     setTimeout(function () {
       var root = document.getElementById('root');
       if (!root || root.childElementCount === 0) {

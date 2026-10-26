@@ -26,14 +26,14 @@ class ChatResponse(BaseModel):
 
 
 async def process_chat_message(req: ChatRequest, client_id: str) -> ChatResponse:
-    # 1. Извлекаем сущности через LLM
+
     extracted = await ollama_service.extract_entities(req.text)
 
-    # 2. Обновляем контекст
+
     amount = extracted.get("amount") or req.context.get("amount")
     term = extracted.get("term") or req.context.get("term")
 
-    # 3. Диалоговая логика
+
     if not amount:
         return ChatResponse(
             reply="Здравствуйте! Подскажите, какую сумму вы планируете привлечь и на какой срок (в месяцах)?",
@@ -48,7 +48,7 @@ async def process_chat_message(req: ChatRequest, client_id: str) -> ChatResponse
             offer=None
         )
 
-    # 4. Детерминированный скоринг (ИИ не считает деньги!)
+
     decision = evaluate_credit(amount, term, client_id)
 
     if decision["decision"] == "declined":
@@ -62,7 +62,7 @@ async def process_chat_message(req: ChatRequest, client_id: str) -> ChatResponse
             offer=None
         )
 
-    # 5. Подбор продукта по правилам витрины (синхронно с pickProduct на фронте)
+
     if amount <= 1_000_000 and term <= 12:
         product_id = "micro"
         product_name = "Микрозайм"
@@ -76,7 +76,7 @@ async def process_chat_message(req: ChatRequest, client_id: str) -> ChatResponse
         product_name = "Оборотный кредит"
         rate = 18.5
 
-    # Формируем предложение (approved или counter_offer)
+
     return ChatResponse(
         reply=(
             f"Рекомендую «{product_name}» под {decision['rate']}% годовых. "
@@ -85,7 +85,7 @@ async def process_chat_message(req: ChatRequest, client_id: str) -> ChatResponse
         ),
         context={"amount": amount, "term": term, "productId": product_id},
         offer=ChatOffer(
-            productId=product_id,  # ← теперь это working / development / micro
+            productId=product_id,
             productName=product_name,
             rate=decision["rate"],
             amount=decision["approved_amount"],
